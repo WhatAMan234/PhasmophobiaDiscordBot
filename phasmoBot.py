@@ -1,9 +1,16 @@
 import atexit
 import discord
 import re
+import json
 from discord.ext import commands
 
-TOKEN = '${{ secrets.TOKEN }}'
+PREFIX = ''
+TOKEN = ''
+
+with open('config.json') as config:
+    data = json.load(config)
+    PREFIX = data['prefix']
+    TOKEN = data['token']
 
 GHOSTS = { 
     "phantom" : ["freezing","emf","orbs"],
@@ -63,14 +70,14 @@ class Phasmo(commands.Cog):
                     if iterations == 1:
                         msg += ", "
                     msg += k
-                    iterations ++
+                    iterations += 1
 
             msg += "\n"
 
         await ctx.send(msg)
 
 
-bot = commands.Bot('$', description='Phasmo helper')
+bot = commands.Bot(PREFIX, description='Phasmo helper')
 bot.add_cog(Phasmo(bot))
 
 @bot.event
