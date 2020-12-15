@@ -3,7 +3,7 @@ import discord
 import re
 from discord.ext import commands
 
-TOKEN = '{TOKEN}'
+TOKEN = '${{ secrets.TOKEN }}'
 
 GHOSTS = { 
     "phantom" : ["freezing","emf","orbs"],
