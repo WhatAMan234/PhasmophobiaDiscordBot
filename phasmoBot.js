@@ -20,6 +20,8 @@ const GHOSTS = '{ '+
   '"poltergeist" : ["orbs","spirit box","fingerprints"],'+
   '"spirit" : ["spirit box","ghost writing","fingerprints"]}';
 
+const EMOJIS = ['🥶','💫','🗣️','✍','5️⃣','🖐️'];
+
 const ghostList = JSON.parse(GHOSTS);
 
 function toTitleCase(str) {
@@ -45,21 +47,37 @@ function toTitleCase(str) {
   return search.substr(0,search.length-1);
 };
 
+function getDefaultMessage(){
+  let response = 'Current Ghost options are: \n'
+  for (const ghost in ghostList) {
+    if (ghostList.hasOwnProperty.call(ghostList, ghost)) {
+      response += ghost + ' : ';
+      const element = ghostList[ghost];
+      element.forEach(evidence => {
+        response += evidence + ', '
+      });
+      response = response.substr(0,response.length-1) + '\n';
+    }
+  }
+  response += '`Evidence options: freezing temps temps, emf, orbs, spirit box, ghost ghost writing, fingerprints`';
+  return response;
+};
+
 function findOtherEvidence(message, currReaction){
   let reactions = message.reactions.cache;
   let ev2 = ''
   reactions.forEach( (reaction, name) => {
-    if(name === '🥶' && reaction.count > 1 && name !== currReaction){
+    if(name === EMOJIS[0] && reaction.count > 1 && name !== currReaction){
       ev2 = 'freezing temps';
-    } else if (name === '💫' && reaction.count > 1 && name !== currReaction){
+    } else if (name === EMOJIS[1] && reaction.count > 1 && name !== currReaction){
       ev2 = 'orbs';
-    } else if (name === '🗣️' && reaction.count > 1 && name !== currReaction){
+    } else if (name === EMOJIS[2] && reaction.count > 1 && name !== currReaction){
       ev2 = 'spirit box';
-    } else if (name === '✍' && reaction.count > 1 && name !== currReaction){
+    } else if (name === EMOJIS[3] && reaction.count > 1 && name !== currReaction){
       ev2 = 'ghost writing';
-    } else if (name === '5️⃣' && reaction.count > 1 && name !== currReaction){
+    } else if (name === EMOJIS[4] && reaction.count > 1 && name !== currReaction){
       ev2 = 'emf';
-    } else if (name === '🖐️' && reaction.count > 1 && name !== currReaction){
+    } else if (name === EMOJIS[5] && reaction.count > 1 && name !== currReaction){
       ev2 = 'fingerprints';
     }
   });
@@ -70,8 +88,8 @@ function optionsCheck(reaction){
   let response = 'Current Ghost options are: \n';
   let evList = [];
   switch(reaction.emoji.name){
-    case '🥶':
-      ev2 = findOtherEvidence(reaction.message,'🥶');
+    case EMOJIS[0]:
+      ev2 = findOtherEvidence(reaction.message,EMOJIS[0]);
       for (const ghost in ghostList) {
         if (ghostList.hasOwnProperty.call(ghostList, ghost)) {
           const element = ghostList[ghost];
@@ -81,7 +99,9 @@ function optionsCheck(reaction){
               element.forEach(evidence => {
                 if (evidence !== 'freezing temps' && evidence !== ev2){
                   response += evidence + ','
-                  evList.push(evidence);
+                  if(!evList.includes(evidence)){
+                    evList.push(evidence);
+                  }
                 }
               });
             }
@@ -91,7 +111,9 @@ function optionsCheck(reaction){
               element.forEach(evidence => {
                 if (evidence !== 'freezing temps'){
                   response += evidence + ','
-                  evList.push(evidence);
+                  if(!evList.includes(evidence)){
+                    evList.push(evidence);
+                  }
                 }
               });
             }
@@ -100,8 +122,8 @@ function optionsCheck(reaction){
         }
       }
       break;
-    case '💫':
-      ev2 = findOtherEvidence(reaction.message,'💫');
+    case EMOJIS[1]:
+      ev2 = findOtherEvidence(reaction.message,EMOJIS[1]);
       for (const ghost in ghostList) {
         if (ghostList.hasOwnProperty.call(ghostList, ghost)) {
           const element = ghostList[ghost];
@@ -111,7 +133,9 @@ function optionsCheck(reaction){
               element.forEach(evidence => {
                 if (evidence !== 'orbs' && evidence !== ev2){
                   response += evidence + ','
-                  evList.push(evidence);
+                  if(!evList.includes(evidence)){
+                    evList.push(evidence);
+                  }
                 }
               });
             }
@@ -121,7 +145,9 @@ function optionsCheck(reaction){
               element.forEach(evidence => {
                 if (evidence !== 'orbs'){
                   response += evidence + ','
-                  evList.push(evidence);
+                  if(!evList.includes(evidence)){
+                    evList.push(evidence);
+                  }
                 }
               });
             }
@@ -130,8 +156,8 @@ function optionsCheck(reaction){
         }
       }
       break;
-    case '🗣️':
-      ev2 = findOtherEvidence(reaction.message,'🗣️');
+    case EMOJIS[2]:
+      ev2 = findOtherEvidence(reaction.message,EMOJIS[2]);
       for (const ghost in ghostList) {
         if (ghostList.hasOwnProperty.call(ghostList, ghost)) {
           const element = ghostList[ghost];
@@ -141,7 +167,9 @@ function optionsCheck(reaction){
               element.forEach(evidence => {
                 if (evidence !== 'spirit box' && evidence !== ev2){
                   response += evidence + ','
-                  evList.push(evidence);
+                  if(!evList.includes(evidence)){
+                    evList.push(evidence);
+                  }
                 }
               });
             }
@@ -151,7 +179,9 @@ function optionsCheck(reaction){
               element.forEach(evidence => {
                 if (evidence !== 'spirit box'){
                   response += evidence + ','
-                  evList.push(evidence);
+                  if(!evList.includes(evidence)){
+                    evList.push(evidence);
+                  }
                 }
               });
             }
@@ -160,8 +190,8 @@ function optionsCheck(reaction){
         }
       }
       break;
-    case '✍':
-      ev2 = findOtherEvidence(reaction.message,'✍');
+    case EMOJIS[3]:
+      ev2 = findOtherEvidence(reaction.message,EMOJIS[3]);
       for (const ghost in ghostList) {
         if (ghostList.hasOwnProperty.call(ghostList, ghost)) {
           const element = ghostList[ghost];
@@ -171,7 +201,9 @@ function optionsCheck(reaction){
               element.forEach(evidence => {
                 if (evidence !== 'ghost writing' && evidence !== ev2){
                   response += evidence + ','
-                  evList.push(evidence);
+                  if(!evList.includes(evidence)){
+                    evList.push(evidence);
+                  }
                 }
               });
             }
@@ -181,7 +213,9 @@ function optionsCheck(reaction){
               element.forEach(evidence => {
                 if (evidence !== 'ghost writing'){
                   response += evidence + ','
-                  evList.push(evidence);
+                  if(!evList.includes(evidence)){
+                    evList.push(evidence);
+                  }
                 }
               });
             }
@@ -190,8 +224,8 @@ function optionsCheck(reaction){
         }
       }
       break;
-    case '5️⃣':
-      ev2 = findOtherEvidence(reaction.message,'5️⃣');
+    case EMOJIS[4]:
+      ev2 = findOtherEvidence(reaction.message,EMOJIS[4]);
       for (const ghost in ghostList) {
         if (ghostList.hasOwnProperty.call(ghostList, ghost)) {
           const element = ghostList[ghost];
@@ -201,7 +235,9 @@ function optionsCheck(reaction){
               element.forEach(evidence => {
                 if (evidence !== 'emf' && evidence !== ev2){
                   response += evidence + ','
-                  evList.push(evidence);
+                  if(!evList.includes(evidence)){
+                    evList.push(evidence);
+                  }
                 }
               });
             }
@@ -211,7 +247,9 @@ function optionsCheck(reaction){
               element.forEach(evidence => {
                 if (evidence !== 'emf'){
                   response += evidence + ','
-                  evList.push(evidence);
+                  if(!evList.includes(evidence)){
+                    evList.push(evidence);
+                  }
                 }
               });
             }
@@ -220,8 +258,8 @@ function optionsCheck(reaction){
         }
       }
       break;
-    case '🖐️':
-      ev2 = findOtherEvidence(reaction.message,'🖐️');
+    case EMOJIS[5]:
+      ev2 = findOtherEvidence(reaction.message,EMOJIS[5]);
       for (const ghost in ghostList) {
         if (ghostList.hasOwnProperty.call(ghostList, ghost)) {
           const element = ghostList[ghost];
@@ -231,7 +269,9 @@ function optionsCheck(reaction){
               element.forEach(evidence => {
                 if (evidence !== 'fingerprints' && evidence !== ev2){
                   response += evidence + ','
-                  evList.push(evidence);
+                  if(!evList.includes(evidence)){
+                    evList.push(evidence);
+                  }
                 }
               });
             }
@@ -241,7 +281,9 @@ function optionsCheck(reaction){
               element.forEach(evidence => {
                 if (evidence !== 'fingerprints'){
                   response += evidence + ','
-                  evList.push(evidence);
+                  if(!evList.includes(evidence)){
+                    evList.push(evidence);
+                  }
                 }
               });
             }
@@ -273,25 +315,14 @@ client.on('message', msg => {
       response = 'https://phasmophobia.fandom.com/wiki/' + search;
       msg.channel.send(response);
     } else if (msg.content.startsWith(OPTIONS_CMD)){
-      let response = 'Current Ghost options are: \n'
-      for (const ghost in ghostList) {
-        if (ghostList.hasOwnProperty.call(ghostList, ghost)) {
-          response += ghost + ' : ';
-          const element = ghostList[ghost];
-          element.forEach(evidence => {
-            response += evidence + ', '
-          });
-          response = response.substr(0,response.length-1) + '\n';
-        }
-      }
-      response += '`Evidence options: freezing temps temps, emf, orbs, spirit box, ghost ghost writing, fingerprints`';
+      response = getDefaultMessage();
       msg.channel.send(response).then(function (msg){
-        msg.react('🥶');
-        msg.react('💫');
-        msg.react('🗣️');
-        msg.react('✍');
-        msg.react('5️⃣');
-        msg.react('🖐️')
+        msg.react(EMOJIS[0]);
+        msg.react(EMOJIS[1]);
+        msg.react(EMOJIS[2]);
+        msg.react(EMOJIS[3]);
+        msg.react(EMOJIS[4]);
+        msg.react(EMOJIS[5])
       }).catch(function(err){
         console.log(err);
       });
@@ -305,6 +336,26 @@ client.on('messageReactionAdd', (reaction, user) => {
       reaction.remove(user);
     } else {
       optionsCheck(reaction);
+    }
+  } else if(!EMOJIS.includes(reaction.emoji.name) && reaction.message.content.startsWith('Current Ghost options are:')){
+    reaction.remove(user);
+  }
+});
+
+client.on('messageReactionRemove', (reaction, user) => {
+  if(reaction.count == 1 && reaction.message.content.startsWith('Current Ghost options are:')){
+    let reactions = reaction.message.reactions.cache;
+    let remaining = reaction;
+    reactions.forEach((react, name)=>{
+      if(react.count > 1){
+        remaining = react;
+        console.log('Remaining Reaction: ' + name);
+      }
+    });
+    if(remaining !== reaction){
+      optionsCheck(remaining);
+    } else {
+      reaction.message.edit(getDefaultMessage());
     }
   }
 });
