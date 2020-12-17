@@ -1,3 +1,3 @@
-#PhasmophobiaDircordBot
+# PhasmophobiaDircordBot
 
 Helper bot for Phasmophobia.
