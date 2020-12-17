@@ -43,6 +43,7 @@ class Phasmo(commands.Cog):
     async def _options(self, ctx: commands.Context, *, search: str):
         intial = []
         possible = []
+        options = []
         search.lower()
         if ' ' in search:
             ev1,ev2 = search.split(' ')
@@ -71,8 +72,11 @@ class Phasmo(commands.Cog):
                         msg += ", "
                     msg += k
                     iterations += 1
+                    if not k in options:
+                        options.append(k)
 
             msg += "\n"
+        msg += "Options: " + str(options)
 
         await ctx.send(msg)
 
