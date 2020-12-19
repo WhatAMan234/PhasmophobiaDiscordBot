@@ -24,6 +24,8 @@ const EMOJIS = ['🥶','💫','🗣️','✍','5️⃣','🖐️'];
 
 const ghostList = JSON.parse(GHOSTS);
 
+const INVALID_EVIDENCE_MSG = '\nInvalid 3rd evidence! Please select one of the options listed above.'
+
 function toTitleCase(str) {
   let search = ''
   words = str.split('_');
@@ -296,7 +298,11 @@ function optionsCheck(reaction){
       console.log('Not an acceptable emoji');
   }
   response += '`Evidence options : ' + evList + '`';
-  reaction.message.edit(response);
+  if(reaction.message.content.endsWith(INVALID_EVIDENCE_MSG)){
+    reaction.message.edit(response+INVALID_EVIDENCE_MSG);
+  } else {
+    reaction.message.edit(response);
+  }
 }
 
 function checkComplete(reaction){
@@ -402,7 +408,9 @@ client.on('messageReactionAdd', (reaction, user) => {
           printCompete(reaction, ghost);
         } else {
           reaction.users.remove(user);
-          reaction.message.channel.send('Invalid 3rd Evidence');
+          if(!reaction.message.content.endsWith(INVALID_EVIDENCE_MSG)){
+            reaction.message.edit(reaction.message.content+INVALID_EVIDENCE_MSG);
+          }
         }
       }
     }
