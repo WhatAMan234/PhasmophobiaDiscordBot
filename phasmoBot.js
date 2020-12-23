@@ -20,11 +20,13 @@ const GHOSTS = '{ '+
   '"poltergeist" : ["orbs","spirit box","fingerprints"],'+
   '"spirit" : ["spirit box","ghost writing","fingerprints"]}';
 
-const EMOJIS = ['🥶','💫','🗣️','✍','5️⃣','🖐️'];
+const EMOJIS = ['🥶','💫','🗣️','✍','5️⃣','🖐️','🔄'];
 
 const ghostList = JSON.parse(GHOSTS);
 
 const INVALID_EVIDENCE_MSG = '\nInvalid 3rd evidence! Please select one of the options listed above.'
+
+let ID = '';
 
 function toTitleCase(str) {
   let search = ''
@@ -51,16 +53,17 @@ function toTitleCase(str) {
 
 function getDefaultMessage(){
   let response = 'Current Ghost options are: \n'
-  for (const ghost in ghostList) {
-    if (ghostList.hasOwnProperty.call(ghostList, ghost)) {
-      response += ghost + ' : ';
-      const element = ghostList[ghost];
-      element.forEach(evidence => {
-        response += evidence + ', '
-      });
-      response = response.substr(0,response.length-1) + '\n';
-    }
-  }
+  // for (const ghost in ghostList) {
+  //   if (ghostList.hasOwnProperty.call(ghostList, ghost)) {
+  //     response += ghost + ' : ';
+  //     const element = ghostList[ghost];
+  //     element.forEach(evidence => {
+  //       response += evidence + ', '
+  //     });
+  //     response = response.substr(0,response.length-1) + '\n';
+  //   }
+  // }
+  response += 'All ghosts are available as options. Try to find a piece of evidence listed below.\n';
   response += '`Evidence options: freezing temps temps, emf, orbs, spirit box, ghost ghost writing, fingerprints`';
   return response;
 };
@@ -352,12 +355,23 @@ function printCompete(reaction, ghost){
   let reactions = reaction.message.reactions.cache;
   reaction.message.edit('The Ghost was a ' + ghost + '!');
   reactions.forEach((react, name)=>{
-    react.remove(react.user);
+    if(react.count !== 2){
+      react.remove(react.user);
+    }
+  });
+  reaction.message.react(EMOJIS[6]);
+}
+
+function removeAllReactions(reaction){
+  let reactions = reaction.message.reactions.cache;
+  reactions.forEach((react, name) =>{
+    react.remove();
   });
 }
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  ID = client.user.id;
 });
 
 client.on('message', msg => {
@@ -391,31 +405,51 @@ client.on('messageReactionAdd', (reaction, user) => {
   let reactions = reaction.message.reactions.cache;
   let evidenceCount = 0;
   let ghost = '';
-  if(reaction.count > 1 && reaction.message.content.startsWith('Current Ghost options are:')){
-    if(reaction.count > 2){
-      reaction.users.remove(user);
-    } else {
-      reactions.forEach((react, name)=>{
-        if(react.count >1){
-          evidenceCount += 1;
-        }
-      });
-      if(evidenceCount < 3){
-        optionsCheck(reaction);
+  let reponse = '';
+  if(ID !== user.id){
+    if(reaction.count > 1 && reaction.message.content.startsWith('Current Ghost options are:')){
+      if(reaction.count > 2){
+        reaction.users.remove(user);
       } else {
-        ghost = checkComplete(reaction);
-        if(ghost !== ''){
-          printCompete(reaction, ghost);
+        reactions.forEach((react, name)=>{
+          if(react.count >1){
+            evidenceCount += 1;
+          }
+        });
+        if(evidenceCount < 3){
+          optionsCheck(reaction);
         } else {
-          reaction.users.remove(user);
-          if(!reaction.message.content.endsWith(INVALID_EVIDENCE_MSG)){
-            reaction.message.edit(reaction.message.content+INVALID_EVIDENCE_MSG);
+          ghost = checkComplete(reaction);
+          if(ghost !== ''){
+            printCompete(reaction, ghost);
+          } else {
+            reaction.users.remove(user);
+            if(!reaction.message.content.endsWith(INVALID_EVIDENCE_MSG)){
+              reaction.message.edit(reaction.message.content+INVALID_EVIDENCE_MSG);
+            }
           }
         }
       }
+    } else if(!EMOJIS.includes(reaction.emoji.name) && reaction.message.content.startsWith('Current Ghost options are:')){
+      reaction.remove();
+    } else if(reaction.emoji.name === EMOJIS[6] && reaction.count > 1 && reaction.message.content.startsWith('The Ghost was a')){
+      if(reaction.count > 2){
+        reaction.users.remove(user);
+      } else {
+        removeAllReactions(reaction);
+        response = getDefaultMessage();
+        reaction.message.edit(response).then(function (msg){
+          msg.react(EMOJIS[0]);
+          msg.react(EMOJIS[1]);
+          msg.react(EMOJIS[2]);
+          msg.react(EMOJIS[3]);
+          msg.react(EMOJIS[4]);
+          msg.react(EMOJIS[5])
+        }).catch(function(err){
+          console.log(err);
+        });
+      }
     }
-  } else if(!EMOJIS.includes(reaction.emoji.name) && reaction.message.content.startsWith('Current Ghost options are:')){
-    reaction.remove();
   }
 });
 
