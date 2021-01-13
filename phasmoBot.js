@@ -1,11 +1,12 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const config = require('./config.json');
+const config = require('./config.json'); // Separate file to store the prefix and token
 const TOKEN = config.token;
 const PREFIX = config.prefix;
 const WIKI_CMD = PREFIX + 'wiki';
 const OPTIONS_CMD = PREFIX + 'options';
 
+// All ghost options
 const GHOSTS = '{ '+
   '"phantom" : ["freezing temps","emf","orbs"],'+
   '"banshee" : ["freezing temps","emf","fingerprints"],'+
@@ -20,14 +21,31 @@ const GHOSTS = '{ '+
   '"poltergeist" : ["orbs","spirit box","fingerprints"],'+
   '"spirit" : ["spirit box","ghost writing","fingerprints"]}';
 
+/*  All used reactions for options command
+    freezing temps = 🥶
+    orbs           = 💫
+    spirit box     = 🗣️
+    ghost writing  = ✍
+    emf level 5    = 5️⃣
+    fingerprints   = 🖐️
+    restart        = 🔄
+*/
 const EMOJIS = ['🥶','💫','🗣️','✍','5️⃣','🖐️','🔄'];
 
+// list of all evidence names (used in the options check method)
+const EVIDENCE = ['freezing temps','orbs','spirit box','ghost writing','emf','fingerprints'];
+
+// converts the ghost list to a json map
 const ghostList = JSON.parse(GHOSTS);
 
+// message that is displayed when an invalid third evidence is selected
 const INVALID_EVIDENCE_MSG = '\nInvalid 3rd evidence! Please select one of the options listed above.'
 
+// used for holding the bot id for message filtering
 let ID = '';
 
+// Returns the string in title case (first letter of each word is capitalized)
+// used in wiki command
 function toTitleCase(str) {
   let search = ''
   words = str.split('_');
@@ -51,256 +69,113 @@ function toTitleCase(str) {
   return search.substr(0,search.length-1);
 };
 
+// Returns the default message that is printed at the start of the options command
 function getDefaultMessage(){
-  let response = 'Current Ghost options are: \n'
-  // for (const ghost in ghostList) {
-  //   if (ghostList.hasOwnProperty.call(ghostList, ghost)) {
-  //     response += ghost + ' : ';
-  //     const element = ghostList[ghost];
-  //     element.forEach(evidence => {
-  //       response += evidence + ', '
-  //     });
-  //     response = response.substr(0,response.length-1) + '\n';
-  //   }
-  // }
+  let response = 'Current Ghost options are: \n';
   response += 'All ghosts are available as options. Try to find a piece of evidence listed below.\n';
-  response += '`Evidence options: freezing temps temps, emf, orbs, spirit box, ghost ghost writing, fingerprints`';
+  response += '`Evidence options: ';
+  EVIDENCE.forEach(element => {
+    response += element + ', ';
+  });
+  response = response.substring(0,response.length-2) + '`';
   return response;
 };
 
+// Used to find what other reaction, if any, has been selected
 function findOtherEvidence(message, currReaction){
   let reactions = message.reactions.cache;
   let ev2 = ''
   reactions.forEach( (reaction, name) => {
     if(name === EMOJIS[0] && reaction.count > 1 && name !== currReaction){
-      ev2 = 'freezing temps';
+      ev2 = EVIDENCE[0];
     } else if (name === EMOJIS[1] && reaction.count > 1 && name !== currReaction){
-      ev2 = 'orbs';
+      ev2 = EVIDENCE[1];
     } else if (name === EMOJIS[2] && reaction.count > 1 && name !== currReaction){
-      ev2 = 'spirit box';
+      ev2 = EVIDENCE[2];
     } else if (name === EMOJIS[3] && reaction.count > 1 && name !== currReaction){
-      ev2 = 'ghost writing';
+      ev2 = EVIDENCE[3];
     } else if (name === EMOJIS[4] && reaction.count > 1 && name !== currReaction){
-      ev2 = 'emf';
+      ev2 = EVIDENCE[4];
     } else if (name === EMOJIS[5] && reaction.count > 1 && name !== currReaction){
-      ev2 = 'fingerprints';
+      ev2 = EVIDENCE[5];
     }
   });
   return ev2;
 }
 
+// Contains the logic to find the remaining options based on input emoji
+function findEvidenceOptions(message, emoji, ev1){
+  let response = 'Current Ghost options are: \n';
+  let evList = [];
+  ev2 = findOtherEvidence(message,emoji);
+  for (const ghost in ghostList) {
+    if (ghostList.hasOwnProperty.call(ghostList, ghost)) {
+      const element = ghostList[ghost];
+      if(ev2 !== ''){
+        if (element.includes(ev1) && element.includes(ev2)) {
+          response += ghost + ' : ';
+          element.forEach(evidence => {
+            if (evidence !== ev1 && evidence !== ev2){
+              response += evidence + ', ';
+              if(!evList.includes(evidence)){
+                evList.push(evidence);
+              }
+            }
+          });
+          response = response + '\n';
+        }
+      } else {
+        if (element.includes(ev1)) {
+          response += ghost + ' : ';
+          element.forEach(evidence => {
+            if (evidence !== ev1){
+              response += evidence + ', ';
+              if(!evList.includes(evidence)){
+                evList.push(evidence);
+              }
+            }
+          });
+          response = response + '\n';
+        }
+      }
+    }
+  }
+  response += '`Evidence options : ';
+  evList.forEach(element => {
+    response += element + ', ';
+  });
+  return response;
+}
+
+// Checks the remaining evidence options once a reaction is selected
 function optionsCheck(reaction){
   let response = 'Current Ghost options are: \n';
   let evList = [];
   switch(reaction.emoji.name){
-    case EMOJIS[0]:
-      ev2 = findOtherEvidence(reaction.message,EMOJIS[0]);
-      for (const ghost in ghostList) {
-        if (ghostList.hasOwnProperty.call(ghostList, ghost)) {
-          const element = ghostList[ghost];
-          if(ev2 !== ''){
-            if (element.includes('freezing temps') && element.includes(ev2)) {
-              response += ghost + ' : ';
-              element.forEach(evidence => {
-                if (evidence !== 'freezing temps' && evidence !== ev2){
-                  response += evidence + ','
-                  if(!evList.includes(evidence)){
-                    evList.push(evidence);
-                  }
-                }
-              });
-            }
-          } else {
-            if (element.includes('freezing temps')) {
-              response += ghost + ' : ';
-              element.forEach(evidence => {
-                if (evidence !== 'freezing temps'){
-                  response += evidence + ','
-                  if(!evList.includes(evidence)){
-                    evList.push(evidence);
-                  }
-                }
-              });
-            }
-          }
-          response = response.substr(0,response.length-1) + '\n';
-        }
-      }
+    case EMOJIS[0]: //FREEZING TEMPS SELECTED
+      response = findEvidenceOptions(reaction.message,EMOJIS[0],EVIDENCE[0]);
       break;
-    case EMOJIS[1]:
-      ev2 = findOtherEvidence(reaction.message,EMOJIS[1]);
-      for (const ghost in ghostList) {
-        if (ghostList.hasOwnProperty.call(ghostList, ghost)) {
-          const element = ghostList[ghost];
-          if(ev2 !== ''){
-            if (element.includes('orbs') && element.includes(ev2)) {
-              response += ghost + ' : ';
-              element.forEach(evidence => {
-                if (evidence !== 'orbs' && evidence !== ev2){
-                  response += evidence + ','
-                  if(!evList.includes(evidence)){
-                    evList.push(evidence);
-                  }
-                }
-              });
-            }
-          } else {
-            if (element.includes('orbs')) {
-              response += ghost + ' : ';
-              element.forEach(evidence => {
-                if (evidence !== 'orbs'){
-                  response += evidence + ','
-                  if(!evList.includes(evidence)){
-                    evList.push(evidence);
-                  }
-                }
-              });
-            }
-          }
-          response = response.substr(0,response.length-1) + '\n';
-        }
-      }
+    case EMOJIS[1]: //GHOST ORBS SELECTED
+      response = findEvidenceOptions(reaction.message,EMOJIS[1],EVIDENCE[1]);
       break;
-    case EMOJIS[2]:
-      ev2 = findOtherEvidence(reaction.message,EMOJIS[2]);
-      for (const ghost in ghostList) {
-        if (ghostList.hasOwnProperty.call(ghostList, ghost)) {
-          const element = ghostList[ghost];
-          if(ev2 !== ''){
-            if (element.includes('spirit box') && element.includes(ev2)) {
-              response += ghost + ' : ';
-              element.forEach(evidence => {
-                if (evidence !== 'spirit box' && evidence !== ev2){
-                  response += evidence + ','
-                  if(!evList.includes(evidence)){
-                    evList.push(evidence);
-                  }
-                }
-              });
-            }
-          } else {
-            if (element.includes('spirit box')) {
-              response += ghost + ' : ';
-              element.forEach(evidence => {
-                if (evidence !== 'spirit box'){
-                  response += evidence + ','
-                  if(!evList.includes(evidence)){
-                    evList.push(evidence);
-                  }
-                }
-              });
-            }
-          }
-          response = response.substr(0,response.length-1) + '\n';
-        }
-      }
+    case EMOJIS[2]: //SPIRIT BOX WAS SELECTED
+      response = findEvidenceOptions(reaction.message,EMOJIS[2],EVIDENCE[2]);
       break;
-    case EMOJIS[3]:
-      ev2 = findOtherEvidence(reaction.message,EMOJIS[3]);
-      for (const ghost in ghostList) {
-        if (ghostList.hasOwnProperty.call(ghostList, ghost)) {
-          const element = ghostList[ghost];
-          if(ev2 !== ''){
-            if (element.includes('ghost writing') && element.includes(ev2)) {
-              response += ghost + ' : ';
-              element.forEach(evidence => {
-                if (evidence !== 'ghost writing' && evidence !== ev2){
-                  response += evidence + ','
-                  if(!evList.includes(evidence)){
-                    evList.push(evidence);
-                  }
-                }
-              });
-            }
-          } else {
-            if (element.includes('ghost writing')) {
-              response += ghost + ' : ';
-              element.forEach(evidence => {
-                if (evidence !== 'ghost writing'){
-                  response += evidence + ','
-                  if(!evList.includes(evidence)){
-                    evList.push(evidence);
-                  }
-                }
-              });
-            }
-          }
-          response = response.substr(0,response.length-1) + '\n';
-        }
-      }
+    case EMOJIS[3]: //GHOST WRITING WAS SELECTED
+      response = findEvidenceOptions(reaction.message,EMOJIS[3],EVIDENCE[3]);
       break;
-    case EMOJIS[4]:
-      ev2 = findOtherEvidence(reaction.message,EMOJIS[4]);
-      for (const ghost in ghostList) {
-        if (ghostList.hasOwnProperty.call(ghostList, ghost)) {
-          const element = ghostList[ghost];
-          if(ev2 !== ''){
-            if (element.includes('emf') && element.includes(ev2)) {
-              response += ghost + ' : ';
-              element.forEach(evidence => {
-                if (evidence !== 'emf' && evidence !== ev2){
-                  response += evidence + ','
-                  if(!evList.includes(evidence)){
-                    evList.push(evidence);
-                  }
-                }
-              });
-            }
-          } else {
-            if (element.includes('emf')) {
-              response += ghost + ' : ';
-              element.forEach(evidence => {
-                if (evidence !== 'emf'){
-                  response += evidence + ','
-                  if(!evList.includes(evidence)){
-                    evList.push(evidence);
-                  }
-                }
-              });
-            }
-          }
-          response = response.substr(0,response.length-1) + '\n';
-        }
-      }
+    case EMOJIS[4]: //EMF WAS SELECTED
+      response = findEvidenceOptions(reaction.message,EMOJIS[4],EVIDENCE[4]);
       break;
-    case EMOJIS[5]:
-      ev2 = findOtherEvidence(reaction.message,EMOJIS[5]);
-      for (const ghost in ghostList) {
-        if (ghostList.hasOwnProperty.call(ghostList, ghost)) {
-          const element = ghostList[ghost];
-          if(ev2 !== ''){
-            if (element.includes('fingerprints') && element.includes(ev2)) {
-              response += ghost + ' : ';
-              element.forEach(evidence => {
-                if (evidence !== 'fingerprints' && evidence !== ev2){
-                  response += evidence + ','
-                  if(!evList.includes(evidence)){
-                    evList.push(evidence);
-                  }
-                }
-              });
-            }
-          } else {
-            if (element.includes('fingerprints')) {
-              response += ghost + ' : ';
-              element.forEach(evidence => {
-                if (evidence !== 'fingerprints'){
-                  response += evidence + ','
-                  if(!evList.includes(evidence)){
-                    evList.push(evidence);
-                  }
-                }
-              });
-            }
-          }
-          response = response.substr(0,response.length-1) + '\n';
-        }
-      }
+    case EMOJIS[5]: //FINGERPRINTS WAS SELECTED
+      response = findEvidenceOptions(reaction.message,EMOJIS[5],EVIDENCE[5]);
       break;
     default:
       console.log('Not an acceptable emoji');
   }
-  response += '`Evidence options : ' + evList + '`';
+  
+  response = response.substring(0,response.length-2) + '`';
+  response = response.replaceAll(', \n','\n');
   if(reaction.message.content.endsWith(INVALID_EVIDENCE_MSG)){
     reaction.message.edit(response+INVALID_EVIDENCE_MSG);
   } else {
@@ -308,6 +183,7 @@ function optionsCheck(reaction){
   }
 }
 
+// Checks if the correct third evidence has been found
 function checkComplete(reaction){
   let reactions = reaction.message.reactions.cache;
   let evidence = [];
@@ -316,22 +192,22 @@ function checkComplete(reaction){
     if(reaction.count === 2){
       switch(name){
         case EMOJIS[0]:
-          evidence.push('freezing temps');
+          evidence.push(EVIDENCE[0]);
           break;
         case EMOJIS[1]:
-          evidence.push('orbs');
+          evidence.push(EVIDENCE[1]);
           break;
         case EMOJIS[2]:
-          evidence.push('spirit box');
+          evidence.push(EVIDENCE[2]);
           break;
         case EMOJIS[3]:
-          evidence.push('ghost writing');
+          evidence.push(EVIDENCE[3]);
           break;
         case EMOJIS[4]:
-          evidence.push('emf');
+          evidence.push(EVIDENCE[4]);
           break;
         case EMOJIS[5]:
-          evidence.push('fingerprints');
+          evidence.push(EVIDENCE[5]);
           break;
         default:
           evidence.push('');
@@ -351,6 +227,7 @@ function checkComplete(reaction){
   return result;
 }
 
+// Edits the message with the ghost name based on the 3 evidences found
 function printCompete(reaction, ghost){
   let reactions = reaction.message.reactions.cache;
   reaction.message.edit('The Ghost was a ' + ghost + '!');
@@ -362,6 +239,7 @@ function printCompete(reaction, ghost){
   reaction.message.react(EMOJIS[6]);
 }
 
+// Removes all of the reactions from the message (used when clicking the restart reaction)
 function removeAllReactions(reaction){
   let reactions = reaction.message.reactions.cache;
   reactions.forEach((react, name) =>{
@@ -369,31 +247,39 @@ function removeAllReactions(reaction){
   });
 }
 
+// Adds the starting reactions for the options command
+function addStartingReactions(message){
+  message.react(EMOJIS[0]);
+  message.react(EMOJIS[1]);
+  message.react(EMOJIS[2]);
+  message.react(EMOJIS[3]);
+  message.react(EMOJIS[4]);
+  message.react(EMOJIS[5]);
+}
+
+// Signs into discord and stores the bot id
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
   ID = client.user.id;
 });
 
+// Handles a message
 client.on('message', msg => {
-  if (msg.content.startsWith(PREFIX)){
-    if (msg.content.startsWith(WIKI_CMD)) {
-      search = msg.content.substr(WIKI_CMD.length+1);
-      if (search == 'highschool' || search == 'hs'){
+  content = msg.content.toLowerCase();
+  if (content.startsWith(PREFIX)){
+    if (content.startsWith(WIKI_CMD)) {
+      search = content.substr(WIKI_CMD.length+1);
+      if (search == 'highschool' || search == 'hs'){ //corrects highschool search
             search = 'brown stone highschool';
       }
       search = toTitleCase(search);
       search = search.replace(' ','_');
       response = 'https://phasmophobia.fandom.com/wiki/' + search;
       msg.channel.send(response);
-    } else if (msg.content.startsWith(OPTIONS_CMD)){
+    } else if (content.startsWith(OPTIONS_CMD)){
       response = getDefaultMessage();
-      msg.channel.send(response).then(function (msg){
-        msg.react(EMOJIS[0]);
-        msg.react(EMOJIS[1]);
-        msg.react(EMOJIS[2]);
-        msg.react(EMOJIS[3]);
-        msg.react(EMOJIS[4]);
-        msg.react(EMOJIS[5])
+      msg.channel.send(response).then( function (msg) {
+        addStartingReactions(msg);
       }).catch(function(err){
         console.log(err);
       });
@@ -423,10 +309,10 @@ client.on('messageReactionAdd', (reaction, user) => {
           if(ghost !== ''){
             printCompete(reaction, ghost);
           } else {
-            reaction.users.remove(user);
             if(!reaction.message.content.endsWith(INVALID_EVIDENCE_MSG)){
               reaction.message.edit(reaction.message.content+INVALID_EVIDENCE_MSG);
             }
+            reaction.users.remove(user);
           }
         }
       }
@@ -438,13 +324,8 @@ client.on('messageReactionAdd', (reaction, user) => {
       } else {
         removeAllReactions(reaction);
         response = getDefaultMessage();
-        reaction.message.edit(response).then(function (msg){
-          msg.react(EMOJIS[0]);
-          msg.react(EMOJIS[1]);
-          msg.react(EMOJIS[2]);
-          msg.react(EMOJIS[3]);
-          msg.react(EMOJIS[4]);
-          msg.react(EMOJIS[5])
+        reaction.message.edit(response).then( function (msg) {
+          addStartingReactions(msg);
         }).catch(function(err){
           console.log(err);
         });
