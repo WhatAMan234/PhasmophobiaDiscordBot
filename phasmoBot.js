@@ -1,25 +1,14 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const config = require('./config.json'); // Separate file to store the prefix and token
+const ghost_list_file = require('./ghosts.json'); // Separate file to store the ghosts and their options
 const TOKEN = config.token;
 const PREFIX = config.prefix;
 const WIKI_CMD = PREFIX + 'wiki';
 const OPTIONS_CMD = PREFIX + 'options';
 
-// All ghost options
-const GHOSTS = '{ '+
-  '"phantom" : ["freezing temps","emf","orbs"],'+
-  '"banshee" : ["freezing temps","emf","fingerprints"],'+
-  '"mare" : ["freezing temps","orbs","spirit box"],'+
-  '"yurei" : ["freezing temps","orbs","ghost writing"],'+
-  '"demon" : ["freezing temps","spirit box","ghost writing"],'+
-  '"wraith" : ["freezing temps","spirit box","fingerprints"],'+
-  '"jinn" : ["emf","orbs","spirit box"],'+
-  '"shade" : ["emf","orbs","ghost writing"],'+
-  '"oni" : ["emf","spirit box","ghost writing"],'+
-  '"revenant" : ["emf","ghost writing","fingerprints"],'+
-  '"poltergeist" : ["orbs","spirit box","fingerprints"],'+
-  '"spirit" : ["spirit box","ghost writing","fingerprints"]}';
+// All ghost options retrieved as a string from the ghost_list_file
+const GHOSTS = JSON.stringify(ghost_list_file.ghost_list);
 
 /*  All used reactions for options command
     freezing temps = 🥶
@@ -287,12 +276,13 @@ client.on('message', msg => {
   }
 });
 
+// Handles an added reaction
 client.on('messageReactionAdd', (reaction, user) => {
   let reactions = reaction.message.reactions.cache;
   let evidenceCount = 0;
   let ghost = '';
   let reponse = '';
-  if(ID !== user.id){
+  if(ID !== user.id){ // Makes sure that the reaction wasn't added by the bot
     if(reaction.count > 1 && reaction.message.content.startsWith('Current Ghost options are:')){
       if(reaction.count > 2){
         reaction.users.remove(user);
@@ -334,6 +324,7 @@ client.on('messageReactionAdd', (reaction, user) => {
   }
 });
 
+// Handles removing a reaction (for when you remove an incorrect evidence)
 client.on('messageReactionRemove', (reaction, user) => {
   if(reaction.count == 1 && reaction.message.content.startsWith('Current Ghost options are:')){
     let reactions = reaction.message.reactions.cache;
