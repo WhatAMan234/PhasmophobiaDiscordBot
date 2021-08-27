@@ -1,18 +1,20 @@
 {
     "ghost_list" : {
-        "Phantom" : ["freezing temps","emf","orbs"],
-        "Banshee" : ["freezing temps","emf","fingerprints"],
-        "Mare" : ["freezing temps","orbs","spirit box"],
-        "Yurei" : ["freezing temps","orbs","ghost writing"],
-        "Demon" : ["freezing temps","spirit box","ghost writing"],
-        "Wraith" : ["freezing temps","spirit box","fingerprints"],
-        "Jinn" : ["emf","orbs","spirit box"],
-        "Shade" : ["emf","orbs","ghost writing"],
-        "Oni" : ["emf","spirit box","ghost writing"],
-        "Revenant" : ["emf","ghost writing","fingerprints"],
-        "Poltergeist" : ["orbs","spirit box","fingerprints"],
-        "Spirit" : ["spirit box","ghost writing","fingerprints"],
-        "Yokai" : ["orbs","spirit box","ghost writing"],
-        "Hantu" : ["orbs","ghost writing","fingerprints"]
+        "Phantom" : ["D.O.T.S.","fingerprints","spirit box"],
+        "Banshee" : ["D.O.T.S.","orbs","fingerprints"],
+        "Mare" : ["ghost writing","orbs","spirit box"],
+        "Yurei" : ["freezing temps","orbs","D.O.T.S."],
+        "Demon" : ["freezing temps","fingerprints","ghost writing"],
+        "Wraith" : ["emf","spirit box","D.O.T.S."],
+        "Jinn" : ["emf","fingerprints","freezing temps"],
+        "Shade" : ["emf","freezing temps","ghost writing"],
+        "Oni" : ["emf","D.O.T.S.","freezing"],
+        "Revenant" : ["freezing temps","ghost writing","orbs"],
+        "Poltergeist" : ["ghost writing","spirit box","fingerprints"],
+        "Spirit" : ["spirit box","ghost writing","emf"],
+        "Yokai" : ["orbs","spirit box","D.O.T.S."],
+        "Hantu" : ["orbs","freezing temps","fingerprints"],
+        "Goryo" : ["D.O.T.S.","emf","fingerprints"],
+        "Myling" : ["emf","fingerprints","ghost writing"]
     }
 }

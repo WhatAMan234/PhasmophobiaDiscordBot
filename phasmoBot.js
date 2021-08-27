@@ -17,12 +17,13 @@ const GHOSTS = JSON.stringify(ghost_list_file.ghost_list);
     ghost writing  = ✍
     emf level 5    = 5️⃣
     fingerprints   = 🖐️
+    D.O.T.S.       = 🎇
     restart        = 🔄
 */
-const EMOJIS = ['🥶','💫','🗣️','✍','5️⃣','🖐️','🔄'];
+const EMOJIS = ['🥶','💫','🗣️','✍','5️⃣','🖐️','🎇','🔄'];
 
 // list of all evidence names (used in the options check method)
-const EVIDENCE = ['freezing temps','orbs','spirit box','ghost writing','emf','fingerprints'];
+const EVIDENCE = ['freezing temps','orbs','spirit box','ghost writing','emf','fingerprints','D.O.T.S.'];
 
 // converts the ghost list to a json map
 const ghostList = JSON.parse(GHOSTS);
@@ -87,6 +88,8 @@ function findOtherEvidence(message, currReaction){
       ev2 = EVIDENCE[4];
     } else if (name === EMOJIS[5] && reaction.count > 1 && name !== currReaction){
       ev2 = EVIDENCE[5];
+    } else if (name === EMOJIS[6] && reaction.count > 1 && name !== currReaction){
+      ev2 = EVIDENCE[6];
     }
   });
   return ev2;
@@ -159,6 +162,9 @@ function optionsCheck(reaction){
     case EMOJIS[5]: //FINGERPRINTS WAS SELECTED
       response = findEvidenceOptions(reaction.message,EMOJIS[5],EVIDENCE[5]);
       break;
+    case EMOJIS[6]: //D.O.T.S. WAS SELECTED
+      response = findEvidenceOptions(reaction.message,EMOJIS[6],EVIDENCE[6]);
+      break;
     default:
       console.log('Not an acceptable emoji');
   }
@@ -198,6 +204,9 @@ function checkComplete(reaction){
         case EMOJIS[5]:
           evidence.push(EVIDENCE[5]);
           break;
+        case EMOJIS[6]:
+          evidence.push(EVIDENCE[6]);
+          break;
         default:
           evidence.push('');
           console.log('Evidence is not in emojis');
@@ -225,7 +234,7 @@ function printCompete(reaction, ghost){
       react.remove(react.user);
     }
   });
-  reaction.message.react(EMOJIS[6]);
+  reaction.message.react(EMOJIS[7]);
 }
 
 // Removes all of the reactions from the message (used when clicking the restart reaction)
@@ -244,6 +253,7 @@ function addStartingReactions(message){
   message.react(EMOJIS[3]);
   message.react(EMOJIS[4]);
   message.react(EMOJIS[5]);
+  message.react(EMOJIS[6]);
 }
 
 // Signs into discord and stores the bot id
@@ -308,7 +318,7 @@ client.on('messageReactionAdd', (reaction, user) => {
       }
     } else if(!EMOJIS.includes(reaction.emoji.name) && reaction.message.content.startsWith('Current Ghost options are:')){
       reaction.remove();
-    } else if(reaction.emoji.name === EMOJIS[6] && reaction.count > 1 && reaction.message.content.startsWith('The Ghost was a')){
+    } else if(reaction.emoji.name === EMOJIS[7] && reaction.count > 1 && reaction.message.content.startsWith('The Ghost was a')){
       if(reaction.count > 2){
         reaction.users.remove(user);
       } else {
