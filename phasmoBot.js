@@ -28,6 +28,16 @@ const EVIDENCE = ['freezing temps','orbs','spirit box','ghost writing','emf','fi
 // converts the ghost list to a json map
 const ghostList = JSON.parse(GHOSTS);
 
+// maps evidence to emoji for clarity
+const evidenceEmoji = JSON.parse(JSON.stringify(ghost_list_file.evidence_emoji));
+
+// length of longest gohost name for padding. Finds the longest ghost name from the ghostList object
+const longestName = Array.from(Object.keys(ghostList)).reduce(
+  function(a, b) {
+    return a.length > b.length ? a : b;
+  }
+).length;
+
 // message that is displayed when an invalid third evidence is selected
 const INVALID_EVIDENCE_MSG = '\nInvalid 3rd evidence! Please select one of the options listed above.'
 
@@ -63,11 +73,14 @@ function toTitleCase(str) {
 function getDefaultMessage(){
   let response = 'Current Ghost options are: \n';
   response += 'All ghosts are available as options. Try to find a piece of evidence listed below.\n';
-  response += '`Evidence options: ';
+  EVIDENCE.forEach( ev => {
+    response += ev + ' : ' + EMOJIS[EVIDENCE.indexOf(ev)] + '\n';
+  });
+  response += '```Evidence options: ';
   EVIDENCE.forEach(element => {
     response += element + ', ';
   });
-  response = response.substring(0,response.length-2) + '`';
+  response = response.substring(0,response.length-2) + '```';
   return response;
 };
 
@@ -97,15 +110,16 @@ function findOtherEvidence(message, currReaction){
 
 // Contains the logic to find the remaining options based on input emoji
 function findEvidenceOptions(message, emoji, ev1){
-  let response = 'Current Ghost options are: \n';
+  let response = 'Current Ghost options are: \n```';
   let evList = [];
   ev2 = findOtherEvidence(message,emoji);
   for (const ghost in ghostList) {
     if (ghostList.hasOwnProperty.call(ghostList, ghost)) {
-      const element = ghostList[ghost];
-      if(ev2 !== ''){
+      let element = ghostList[ghost];
+      element = sortEvidence(element, EVIDENCE);
+      if(ev2 !== ''){ // if second evidence
         if (element.includes(ev1) && element.includes(ev2)) {
-          response += ghost + ' : ';
+          response += ghost.padStart(longestName) + ' : '; // name is left padded to match longes ghost name
           element.forEach(evidence => {
             if (evidence !== ev1 && evidence !== ev2){
               response += evidence + ', ';
@@ -116,9 +130,9 @@ function findEvidenceOptions(message, emoji, ev1){
           });
           response = response + '\n';
         }
-      } else {
+      } else { // if no second evidence
         if (element.includes(ev1)) {
-          response += ghost + ' : ';
+          response += ghost.padStart(longestName) + ' : '; // name is left padded to match longes ghost name
           element.forEach(evidence => {
             if (evidence !== ev1){
               response += evidence + ', ';
@@ -132,9 +146,11 @@ function findEvidenceOptions(message, emoji, ev1){
       }
     }
   }
-  response += '`Evidence options : ';
-  evList.forEach(element => {
-    response += element + ', ';
+  response += '```\n```Evidence options : ';
+  EVIDENCE.forEach(element => {
+    if(evList.includes(element)){
+      response += element + ', ';
+    }
   });
   return response;
 }
@@ -169,7 +185,7 @@ function optionsCheck(reaction){
       console.log('Not an acceptable emoji');
   }
   
-  response = response.substring(0,response.length-2) + '`';
+  response = response.substring(0,response.length-2) + '```';
   response = response.replaceAll(', \n','\n');
   if(reaction.message.content.endsWith(INVALID_EVIDENCE_MSG)){
     reaction.message.edit(response+INVALID_EVIDENCE_MSG);
@@ -254,6 +270,15 @@ function addStartingReactions(message){
   message.react(EMOJIS[4]);
   message.react(EMOJIS[5]);
   message.react(EMOJIS[6]);
+}
+
+// Sorts the evidence of the ghosts to match the reaction list
+function sortEvidence(ghostArr, evArr){
+  tempArr = ghostArr.slice();
+  tempArr.sort((prev, next) => {
+    return evArr.indexOf(prev) - evArr.indexOf(next);
+  })
+  return tempArr;
 }
 
 // Signs into discord and stores the bot id

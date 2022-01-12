@@ -8,13 +8,27 @@
         "Wraith" : ["emf","spirit box","D.O.T.S."],
         "Jinn" : ["emf","fingerprints","freezing temps"],
         "Shade" : ["emf","freezing temps","ghost writing"],
-        "Oni" : ["emf","D.O.T.S.","freezing"],
+        "Oni" : ["emf","D.O.T.S.","freezing temps"],
         "Revenant" : ["freezing temps","ghost writing","orbs"],
         "Poltergeist" : ["ghost writing","spirit box","fingerprints"],
         "Spirit" : ["spirit box","ghost writing","emf"],
         "Yokai" : ["orbs","spirit box","D.O.T.S."],
         "Hantu" : ["orbs","freezing temps","fingerprints"],
         "Goryo" : ["D.O.T.S.","emf","fingerprints"],
-        "Myling" : ["emf","fingerprints","ghost writing"]
+        "Myling" : ["emf","fingerprints","ghost writing"],
+        "Onryo" : ["spirit box","orbs","freezing temps"],
+        "The Twins" : ["emf","spirit box","freezing temps"],
+        "Raiju" : ["emf","orbs","D.O.T.S."],
+        "Obake" : ["emf","fingerprints","orbs"],
+        "The Mimic" : ["spirit box","fingerprints","freezing temps"]
+    },
+    "evidence_emoji" : {
+        "freezing temps" : "🥶",
+        "orbs" : "💫",
+        "spirit box" : "🗣️",
+        "ghost writing" : "✍",
+        "emf" : "5️⃣",
+        "fingerprints" : "🖐️",
+        "D.O.T.S." : "🎇"
     }
 }
