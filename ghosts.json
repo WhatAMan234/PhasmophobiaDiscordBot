@@ -20,7 +20,10 @@
         "The Twins" : ["emf","spirit box","freezing temps"],
         "Raiju" : ["emf","orbs","D.O.T.S."],
         "Obake" : ["emf","fingerprints","orbs"],
-        "The Mimic" : ["spirit box","fingerprints","freezing temps"]
+        "The Mimic" : ["spirit box","fingerprints","freezing temps"],
+        "Moroi" : ["spirit box","ghost writing","freezing temps"],
+        "Deogen" : ["spirit box","ghost writing","D.O.T.S."],
+        "Thaye" : ["orbs","ghost writing","D.O.T.S."]
     },
     "evidence_emoji" : {
         "freezing temps" : "🥶",

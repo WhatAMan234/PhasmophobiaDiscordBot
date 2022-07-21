@@ -39,10 +39,14 @@ const longestName = Array.from(Object.keys(ghostList)).reduce(
 ).length;
 
 // message that is displayed when an invalid third evidence is selected
-const INVALID_EVIDENCE_MSG = '\nInvalid 3rd evidence! Please select one of the options listed above.'
+const INVALID_EVIDENCE_MSG = '```\nInvalid 3rd evidence! Please select one of the options listed above.\nIf trying to add mimin evidence, please unselect orbs.```'
 
 // used for holding the bot id for message filtering
 let ID = '';
+
+let mimicMsgNeeded = false
+
+let mimicEvNeeded = ''
 
 // Returns the string in title case (first letter of each word is capitalized)
 // used in wiki command
@@ -118,7 +122,7 @@ function findEvidenceOptions(message, emoji, ev1){
       let element = ghostList[ghost];
       element = sortEvidence(element, EVIDENCE);
       if(ev2 !== ''){ // if second evidence
-        if (element.includes(ev1) && element.includes(ev2)) {
+        if (ghost != 'The Mimic' && (element.includes(ev1) && element.includes(ev2))) {
           response += ghost.padStart(longestName) + ' : '; // name is left padded to match longes ghost name
           element.forEach(evidence => {
             if (evidence !== ev1 && evidence !== ev2){
@@ -129,9 +133,58 @@ function findEvidenceOptions(message, emoji, ev1){
             }
           });
           response = response + '\n';
+        } else if(ghost == 'The Mimic') {
+          if((ev1 == 'orbs' || ev2 == 'orbs') && (element.includes(ev1) || element.includes(ev2))){
+            response += ghost.padStart(longestName) + ' : '; // name is left padded to match longes ghost name
+            if(ev1 == 'orbs'){
+              element.forEach(evidence => {
+                if (evidence !== ev2){
+                  response += evidence + ', ';
+                  if(!evList.includes(evidence)){
+                    evList.push(evidence);
+                  }
+                }
+              });
+              response = response + '\n';
+            } else {
+              element.forEach(evidence => {
+                if (evidence !== ev1){
+                  response += evidence + ', ';
+                  if(!evList.includes(evidence)){
+                    evList.push(evidence);
+                  }
+                }
+              });
+              response = response + '\n';
+            }
+          } else {
+            if(element.includes(ev1) && element.includes(ev2)) {
+              response += ghost.padStart(longestName) + ' : '; // name is left padded to match longes ghost name
+              element.forEach(evidence => {
+                if (evidence !== ev1 && evidence !== ev2){
+                  response += evidence + ', ';
+                  if(!evList.includes(evidence)){
+                    evList.push(evidence);
+                  }
+                }
+              });
+              response = response + '\n';
+            }
+          }
         }
       } else { // if no second evidence
         if (element.includes(ev1)) {
+          response += ghost.padStart(longestName) + ' : '; // name is left padded to match longes ghost name
+          element.forEach(evidence => {
+            if (evidence !== ev1){
+              response += evidence + ', ';
+              if(!evList.includes(evidence)){
+                evList.push(evidence);
+              }
+            }
+          });
+          response = response + '\n';
+        } else if(ghost == 'The Mimic' && ev1 == 'orbs') {
           response += ghost.padStart(longestName) + ' : '; // name is left padded to match longes ghost name
           element.forEach(evidence => {
             if (evidence !== ev1){
@@ -236,6 +289,19 @@ function checkComplete(reaction){
       if(element.includes(evidence[0]) && element.includes(evidence[1]) && element.includes(evidence[2])){
         result = ghost;
       }
+      if(ghost == 'The Mimic' && evidence.includes('orbs')){
+        mimicMsgNeeded = true;
+        evidence.forEach(ev => {
+          if(!element.includes(ev) && ev!=='orbs'){
+            mimicMsgNeeded = false;
+          }
+        });
+        element.forEach(ev => {
+          if(ev !== 'orbs' && !evidence.includes(ev)){
+            mimicEvNeeded = ev;
+          }
+        });
+      }
     }
   }
   return result;
@@ -244,7 +310,13 @@ function checkComplete(reaction){
 // Edits the message with the ghost name based on the 3 evidences found
 function printCompete(reaction, ghost){
   let reactions = reaction.message.reactions.cache;
-  reaction.message.edit('The Ghost was a ' + ghost + '!');
+  if(!mimicMsgNeeded){
+    reaction.message.edit('The Ghost was a ' + ghost + '!');
+  } else {
+    reaction.message.edit('The Ghost was a ' + ghost + '!\n```The Ghost could also be a Mimic! Check for ' + mimicEvNeeded + '!```\n')
+    mimicEvNeeded = ''
+    mimicMsgNeeded = false
+  }
   reactions.forEach((react, name)=>{
     if(react.count !== 2){
       react.remove(react.user);
@@ -320,7 +392,11 @@ client.on('messageReactionAdd', (reaction, user) => {
   if(ID !== user.id){ // Makes sure that the reaction wasn't added by the bot
     if(reaction.count > 1 && reaction.message.content.startsWith('Current Ghost options are:')){
       if(reaction.count > 2){
-        reaction.users.remove(user);
+        reaction.users.cache.forEach((snowflake, reactor)=>{
+          if(reactor !== reaction.message.author.id){
+            reaction.users.remove(reactor);
+          }
+        });
       } else {
         reactions.forEach((react, name)=>{
           if(react.count >1){
@@ -334,10 +410,10 @@ client.on('messageReactionAdd', (reaction, user) => {
           if(ghost !== ''){
             printCompete(reaction, ghost);
           } else {
+            reaction.users.remove(user);
             if(!reaction.message.content.endsWith(INVALID_EVIDENCE_MSG)){
               reaction.message.edit(reaction.message.content+INVALID_EVIDENCE_MSG);
             }
-            reaction.users.remove(user);
           }
         }
       }
@@ -364,13 +440,18 @@ client.on('messageReactionRemove', (reaction, user) => {
   if(reaction.count == 1 && reaction.message.content.startsWith('Current Ghost options are:')){
     let reactions = reaction.message.reactions.cache;
     let remaining = reaction;
+    let evidenceCount = 0;
     reactions.forEach((react, name)=>{
       if(react.count > 1){
         remaining = react;
+        evidenceCount += 1;
       }
     });
     if(remaining !== reaction){
       optionsCheck(remaining);
+      if(reaction.message.content.endsWith(INVALID_EVIDENCE_MSG) && evidenceCount == 1){
+        reaction.message.edit(reaction.message.content.replace(INVALID_EVIDENCE_MSG,''));
+      }
     } else {
       reaction.message.edit(getDefaultMessage());
     }
