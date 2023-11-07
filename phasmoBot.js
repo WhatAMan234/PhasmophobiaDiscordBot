@@ -239,7 +239,7 @@ function optionsCheck(reaction){
   }
   
   response = response.substring(0,response.length-2) + '```';
-  response = response.replaceAll(', \n','\n');
+  response = response.replace(/(, \n)/g,'\n');
   if(reaction.message.content.endsWith(INVALID_EVIDENCE_MSG)){
     reaction.message.edit(response+INVALID_EVIDENCE_MSG);
   } else {
