@@ -8,11 +8,11 @@ $wiki command<br>
 $options<br>
   -Main project of the bot. Dynamically builds evidence options based on reactions to the message<br>
   -Default Message<br>
-![image](https://user-images.githubusercontent.com/22804014/149194134-87660c0e-7f8f-4def-958d-b5c20948a019.png)<br>
+<img width="715" height="342" alt="image" src="https://github.com/user-attachments/assets/0fc72543-5d52-4769-ba0f-88b5aed708b7" />
   -One Evidence Selected Message<br>
-![image](https://user-images.githubusercontent.com/22804014/149194312-a98406d3-52fe-44c0-9eb2-1f29c5324f4d.png)<br>
+<img width="722" height="417" alt="image" src="https://github.com/user-attachments/assets/e68cf972-474d-4e21-af79-86e242202746" />
   -Two Evidence Selected Message<br>
-![image](https://user-images.githubusercontent.com/22804014/149194339-aa30e3fe-f3bb-4b45-ab84-e5974a62968d.png)<br>
+<img width="718" height="284" alt="image" src="https://github.com/user-attachments/assets/8e8649de-19a0-40ee-b5ec-e5665bf1f0f4" />
   -All Evidences Found<br>
   -Can hit the reaction on the right to start back at the default message<br>
-![image](https://user-images.githubusercontent.com/22804014/149194924-f98d1560-1267-4bd4-82a1-072e06ac80e5.png)
+<img width="704" height="115" alt="image" src="https://github.com/user-attachments/assets/758c5716-4910-4947-9f92-dba8c91573b0" />
