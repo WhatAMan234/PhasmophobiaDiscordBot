@@ -16,14 +16,14 @@ const GHOSTS = JSON.stringify(ghost_list_file.ghost_list);
     spirit box     = 🗣️
     ghost writing  = ✍
     emf level 5    = 5️⃣
-    fingerprints   = 🖐️
+    ultraviolet    = 🟣
     D.O.T.S.       = 🎇
     restart        = 🔄
 */
-const EMOJIS = ['🥶','💫','🗣️','✍','5️⃣','🖐️','🎇','🔄'];
+const EMOJIS = ['🥶','💫','🗣️','✍','5️⃣','🟣','🎇','🔄'];
 
 // list of all evidence names (used in the options check method)
-const EVIDENCE = ['freezing temps','orbs','spirit box','ghost writing','emf','fingerprints','D.O.T.S.'];
+const EVIDENCE = ['freezing temps','orbs','spirit box','ghost writing','emf','ultraviolet','D.O.T.S.'];
 
 // converts the ghost list to a json map
 const ghostList = JSON.parse(GHOSTS);
@@ -228,7 +228,7 @@ function optionsCheck(reaction){
     case EMOJIS[4]: //EMF WAS SELECTED
       response = findEvidenceOptions(reaction.message,EMOJIS[4],EVIDENCE[4]);
       break;
-    case EMOJIS[5]: //FINGERPRINTS WAS SELECTED
+    case EMOJIS[5]: //ULTRAVIOLET WAS SELECTED
       response = findEvidenceOptions(reaction.message,EMOJIS[5],EVIDENCE[5]);
       break;
     case EMOJIS[6]: //D.O.T.S. WAS SELECTED
@@ -366,7 +366,7 @@ client.on('message', msg => {
     if (content.startsWith(WIKI_CMD)) {
       search = content.substr(WIKI_CMD.length+1);
       if (search == 'highschool' || search == 'hs'){ //corrects highschool search
-            search = 'brown stone highschool';
+            search = 'Brown Stone Highschool';
       }
       search = toTitleCase(search);
       search = search.replace(' ','_');

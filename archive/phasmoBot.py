@@ -14,17 +14,17 @@ with open('config.json') as config:
 
 GHOSTS = { 
     "phantom" : ["freezing","emf","orbs"],
-    "banshee" : ["freezing","emf","fingerprints"],
+    "banshee" : ["freezing","emf","ultraviolet"],
     "mare" : ["freezing","orbs","spiritbox"],
     "yurei" : ["freezing","orbs","writing"],
     "demon" : ["freezing","spiritbox","writing"],
-    "wraith" : ["freezing","spiritbox","fingerprints"],
+    "wraith" : ["freezing","spiritbox","ultraviolet"],
     "jinn" : ["emf","orbs","spiritbox"],
     "shade" : ["emf","orbs","writing"],
     "oni" : ["emf","spiritbox","writing"],
-    "revenant" : ["emf","writing","fingerprints"],
-    "poltergeist" : ["orbs","spiritbox","fingerprints"],
-    "spirit" : ["spiritbox","writing","fingerprints"]
+    "revenant" : ["emf","writing","ultraviolet"],
+    "poltergeist" : ["orbs","spiritbox","ultraviolet"],
+    "spirit" : ["spiritbox","writing","ultraviolet"]
 }
 
 class Phasmo(commands.Cog):
