@@ -1,7 +1,9 @@
 {
     "ghost_list" : {
+        "Aswang"      : ["freezing temps","ghost writing","D.O.T.S."],
         "Banshee"     : ["D.O.T.S.","orbs","ultraviolet"],
         "Dayan"       : ["emf","orbs","spirit box"],
+        "Deildegast"  : ["emf","ghost writing","D.O.T.S."],
         "Demon"       : ["freezing temps","ultraviolet","ghost writing"],
         "Deogen"      : ["spirit box","ghost writing","D.O.T.S."],
         "Gallu"       : ["emf","fingerprints","spirit box"],
